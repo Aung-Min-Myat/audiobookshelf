@@ -126,7 +126,8 @@ Prompt: evidence/plans/SP-S01-prompt.md
 ~[05:47] (exact, file times) the agent's script wrote AuthorFinder.d.ts (1156 bytes), BookFinder.d.ts (7756) and PodcastFinder.d.ts (743), copied into evidence/test-results/SP-S01/dts/.
 ~[05:48] (exact, footer) V7 finished (turn of 2m 33s): exit 0, 3 files, 0 declaration diagnostics, 0 occurrences of `any` in the declaration output, which the agent labels a lower bound. dts-any.txt lists unchecked internal any flows (fs.pathExists and fs.ensureDir results, downloadImageFile resolving Promise<any>, parameters of untyped JS functions, and a possible any from htmlSanitizer.stripAllTags that is not in the spec). It stopped before V8-V11.
 ~[05:50] my checks: grep for any in the three .d.ts files printed nothing; dts-any.txt read; a search of evidence/test-results/SP-S01 for my Windows username, "Users\", my personal email and my surname printed nothing.
-~[05::52] I stopped for the day before V8-V11, the final report, the whole-branch reviewer and the finish step. I have not decided about the exact any count or about the commit email.
+~[05:52] I stopped for the day before V8-V11, the final report, the whole-branch reviewer and the finish step. I have not decided about the exact any count or about the commit email.
+~[05:50] my checks: grep for any in the three .d.ts files printed nothing; dts-any.txt read; a privacy search of evidence/test-results/SP-S01 for my username, home-folder paths and contact details printed nothing.
 
 
 ## Skills that appeared (lines like Skill(superpowers:...))
@@ -136,4 +137,8 @@ Skill(superpowers:brainstorming), loaded by itself.
 None so far.
 
 ## /usage after the plan
-(not yet)
+Reading at the start of S01 (~01:40): session 9% | week (all models) 25% | week (Fable) 12%. I did not take a reading at the boundary between planning and execution (~03:50), so the cost of design and execution cannot be separated.
+
+~[05:55] /usage at the end of S01 (after Task 3 and V7, before V8-V11): session 13% (resets 9:40am), week (all models) 29% (resets Oct 6, 6am), week (Fable) 12%. Prompt cache (main): 111 requests, 99% of input tokens from cache, no misses.
+~[05:55] compared with the start of S01 (session 9%, week 25%, Fable 12%): the weekly bar rose by about 4 points over about 4 hours. The session bar is not comparable because the 5-hour window reset at 04:40am. The Fable bar did not move. The weekly bar may include other Claude use, and the figures are rounded.
+~[05:55] /usage contributions panel (last 24h, approximate, local sessions only, includes the earlier Fable test session): 90% of usage at over 150k context; superpowers plugin 34% (brainstorming 16%, test-driven-development 11%, writing-plans 5%, executing-plans 1%).
