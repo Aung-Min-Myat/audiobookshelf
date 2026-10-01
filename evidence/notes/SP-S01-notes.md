@@ -43,6 +43,11 @@ Prompt: evidence/plans/SP-S01-prompt.md
 [03:01] I approved sections 2 and 3 (reply 4 in evidence/plans/SP-S01-replies.md) with two additions: cite the third 404 line (OpenLibrary.js:96), and list every implicit any from untyped JS using declaration output. The agent was told to write the spec, commit it, and stop for my review.
 [03:03] agent checked my addition (a): it says OpenLibrary.search() (OpenLibrary.js:96) is never called by BookFinder or anywhere else, so it will log this in the spec and not in the ProviderErrorResult comment. I checked: line 96 is inside search(query), which starts at line 89 (isbnLookup is at 31, searchTitle at 109). A text search of server/ and test/ found no call on an OpenLibrary object, and the broader .search( check listed only other providers, BookFinder's own search(), and unrelated code. Conclusion: no call found by text search (a dynamic call would not show up).
 [03:07] 5th probe prompt (probe 4: how tsc emits comments and blank lines around declare statements, and the isbn-type comment): chose option 1 (Yes).
+[03:10] agent wrote the design spec (evidence/plans/2026-10-02-SP-S01-finders-ts-design.md, 383 lines). Its self-review found 5 incorrect line references (J2, J3, J7, C12, P6) and a wrong V9 statement ("Number( appears nowhere"), and it fixed them. Probe P-2 triggered TS5055 against repo JS files; the agent says nothing was written to the repo. I checked with git status: [result].
+[03:12] agent asked to run a read-only grep to count existing Number( calls in server/finders/*.js. Chose option 1 (Yes).
+[03:13] I checked its claims about bug 1: BookFinder.js:374-378 shows search() defaults of 4, 4 and 5 when options are not passed, so findCovers' {titleDistance: 2, authorDistance: 2} is ignored. CustomProviderAdapter.js:36-39 adds isbn to the query if truthy. node -e "console.log(new URLSearchParams({isbn:{}}).toString())" printed isbn=%5Bobject+Object%5D. Read from code and a one-line check, not a live request.
+[03:15] I noted that BookFinder.js lines 376-378 already contain 3 Number( calls, so the V9 expected counts must include them.
+[03:16] spec length is 383 lines for 805 lines of source code.
 
 ## Skills that appeared (lines like Skill(superpowers:...))
 Skill(superpowers:brainstorming), loaded by itself.
