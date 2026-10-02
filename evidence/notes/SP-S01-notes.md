@@ -128,10 +128,18 @@ Prompt: evidence/plans/SP-S01-prompt.md
 
 
 ## Skills that appeared (lines like Skill(superpowers:...))
-Skill(superpowers:brainstorming), loaded by itself.
+Skill(superpowers:brainstorming), loaded by itself at my first prompt.
+Skill(superpowers:writing-plans), after I approved the spec.
+Skill(superpowers:executing-plans), after I chose Native execution.
+Skill(superpowers:test-driven-development), after executing-plans.
+Not seen so far: subagent-driven-development, requesting-code-review and finishing-a-development-branch (the whole-branch review and the finish step have not run yet), and using-git-worktrees (my prompt told it to skip worktrees).
+
 
 ## Things I had to correct or refuse
-None so far.
+~[04:15] precaution: I copied the TypeScript crash log before the green build, because the plan's BUILD command writes the red and green runs to the same file name. This was not an agent error.
+~[04:22] the agent called build-PodcastFinder-red-crash.txt "a file I did not create". It was my own copy of the Step 3 crash log. I told it so.
+~[05:17] I found a defect in the agent's full-file Write of BookFinder.ts: it replaced the escape sequences \u0300 and \u036f in the replaceAccentedChars regex with literal combining characters, although it had said it preserved every original line except the spec's listed changes. I told it to restore the exact line and to compare the whole file line by line. It did, and it saved the list of unlisted differences.
+~[05:50] I did not choose No at any command prompt and never chose the "don't ask again" or auto-mode options in this session.
 
 ## /usage after the plan
 Reading at the start of S01 (~01:40): session 9% | week (all models) 25% | week (Fable) 12%. I did not take a reading at the boundary between planning and execution (~03:50), so the cost of design and execution cannot be separated.
