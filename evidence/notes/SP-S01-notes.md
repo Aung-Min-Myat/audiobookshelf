@@ -125,6 +125,15 @@ Prompt: evidence/plans/SP-S01-prompt.md
 ~[05:48] (exact, footer) V7 finished (turn of 2m 33s): exit 0, 3 files, 0 declaration diagnostics, 0 occurrences of `any` in the declaration output, which the agent labels a lower bound. dts-any.txt lists unchecked internal any flows (fs.pathExists and fs.ensureDir results, downloadImageFile resolving Promise<any>, parameters of untyped JS functions, and a possible any from htmlSanitizer.stripAllTags that is not in the spec). It stopped before V8-V11.
 ~[05:50] my checks: grep for any in the three .d.ts files printed nothing; dts-any.txt read; a privacy search of evidence/test-results/SP-S01 for my username, home-folder paths and contact details printed nothing.
 ~[05:52] I stopped for the day before V8-V11, the final report, the whole-branch reviewer and the finish step. I have not decided about the exact any count or about the commit email.
+~[05:53] I closed Claude Code. Session ID of S01: 03d0fa39-daf5-4873-a4a3-737ef9787d46 (claude --resume <id> reopens it). Not yet done in this session: V8-V11, the final report, the whole-branch review and the finish step.
+~[05:55] I committed my S01 notes (07ef8452): skills, corrections and usage readings. git status was clean.
+
+S02 start: [2/10/2026] 21:13 (exact, from Get-Date). A fresh session, not a resume. Commit at start: 07ef8452. Claude Code 2.1.286, Node v24.21.0, branch Aung-Min-Myat/phase1.
+~[21:15] /permissions at the start of S02: 7 allow rules (git add, commit, diff, mv, status; npm run build:server; npm test) and 8 deny rules: the 7 I wrote (git merge, push, rebase, reset --hard; npm i; npm install; Edit(test/**)) plus "PowerShell", which is not in my settings.local.json. Source of the PowerShell rule: not found yet. Recently denied tab: [empty / what it listed].
+~[21:17] /usage at the start of S02: session [x]% | week (all models) [y]% | week (Fable) 12%. The "last 24h" contributions panel was identical to the end of S01 (90% of usage at over 150k context; superpowers plugin 34%), so it still describes S01, not S02.
+~[21:18] Superpowers version at the start of S02: [6.4.1 / what /plugin shows]. Model: [Opus 5.5 / what /model shows], effort [xhigh]. Mode: accept edits on.
+~[21:24] S02 mode: fresh session, not resumed. Reason: S01 ran at over 150k context (90% of usage), and I wanted a clean start with the spec, plan, ledger, replies and commits as the only carried-over context. I did not use claude --resume.
+~[21:25] Claude Code did not act on my pasted "Continue the SP-S01 plan" message. It asked me to confirm it was my instruction, because the whole message was pasted text with nothing typed outside it (a turn of 15s). Its summary of the work matched my message and the repo. I replied "Yes, that is my instruction. Go."
 
 
 ## Skills that appeared (lines like Skill(superpowers:...))
