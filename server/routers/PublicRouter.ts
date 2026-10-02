@@ -1,9 +1,13 @@
-const express = require('express')
-const ShareController = require('../controllers/ShareController')
-const SessionController = require('../controllers/SessionController')
+import express = require('express')
+import ShareController = require('../controllers/ShareController')
+import SessionController = require('../controllers/SessionController')
+type PlaybackSessionManager = import('../managers/PlaybackSessionManager')
 
 class PublicRouter {
-  constructor(playbackSessionManager) {
+  declare playbackSessionManager: PlaybackSessionManager
+  declare router: express.Express
+
+  constructor(playbackSessionManager: PlaybackSessionManager) {
     /** @type {import('../managers/PlaybackSessionManager')} */
     this.playbackSessionManager = playbackSessionManager
 
@@ -12,7 +16,7 @@ class PublicRouter {
     this.init()
   }
 
-  init() {
+  init(): void {
     this.router.get('/share/:slug', ShareController.getMediaItemShareBySlug.bind(this))
     this.router.get('/share/:slug/track/:index', ShareController.getMediaItemShareAudioTrack.bind(this))
     this.router.get('/share/:slug/cover', ShareController.getMediaItemShareCoverImage.bind(this))
@@ -21,4 +25,4 @@ class PublicRouter {
     this.router.get('/session/:id/track/:index', SessionController.getTrack.bind(this))
   }
 }
-module.exports = PublicRouter
+export = PublicRouter

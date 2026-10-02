@@ -1,6 +1,18 @@
-const nodemailer = require('nodemailer')
-const Database = require('../Database')
-const Logger = require("../Logger")
+/// <reference path="../types/untypedModules.d.ts" />
+import nodemailer = require('nodemailer')
+import Database = require('../Database')
+import Logger = require("../Logger")
+import type { Response } from 'express'
+
+// Only the fields this manager reads (ebookFile is libraryItem.media.ebookFile, device comes from EmailSettings)
+interface EbookFileToSend {
+  metadata: { filename: string; path: string }
+}
+
+interface EreaderDeviceTarget {
+  name: string
+  email: string
+}
 
 class EmailManager {
   constructor() { }
@@ -9,7 +21,7 @@ class EmailManager {
     return nodemailer.createTransport(Database.emailSettings.getTransportObject())
   }
 
-  async sendTest(res) {
+  async sendTest(res: Response): Promise<Response | undefined> {
     Logger.info(`[EmailManager] Sending test email`)
     const transporter = this.getTransporter()
 
@@ -36,7 +48,7 @@ class EmailManager {
     })
   }
 
-  async sendEBookToDevice(ebookFile, device, res) {
+  async sendEBookToDevice(ebookFile: EbookFileToSend, device: EreaderDeviceTarget, res: Response): Promise<Response | undefined> {
     Logger.info(`[EmailManager] Sending ebook "${ebookFile.metadata.filename}" to device "${device.name}"/"${device.email}"`)
     const transporter = this.getTransporter()
 
@@ -69,4 +81,4 @@ class EmailManager {
     })
   }
 }
-module.exports = EmailManager
+export = EmailManager

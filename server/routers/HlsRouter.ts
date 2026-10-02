@@ -1,14 +1,20 @@
-const express = require('express')
-const Path = require('path')
+import express = require('express')
+import Path = require('path')
 
-const Logger = require('../Logger')
-const SocketAuthority = require('../SocketAuthority')
+import Logger = require('../Logger')
+import SocketAuthority = require('../SocketAuthority')
 
-const fs = require('../libs/fsExtra')
+import fs = require('../libs/fsExtra')
+type Auth = import('../Auth')
+type PlaybackSessionManager = import('../managers/PlaybackSessionManager')
 
 
 class HlsRouter {
-  constructor(auth, playbackSessionManager) {
+  declare auth: Auth
+  declare playbackSessionManager: PlaybackSessionManager
+  declare router: express.Express
+
+  constructor(auth: Auth, playbackSessionManager: PlaybackSessionManager) {
     this.auth = auth
     this.playbackSessionManager = playbackSessionManager
 
@@ -17,11 +23,11 @@ class HlsRouter {
     this.init()
   }
 
-  init() {
+  init(): void {
     this.router.get('/:stream/:file', this.streamFileRequest.bind(this))
   }
 
-  parseSegmentFilename(filename) {
+  parseSegmentFilename(filename: string): number {
     var basename = Path.basename(filename, Path.extname(filename))
     var num_part = basename.split('-')[1]
     return Number(num_part)
@@ -36,7 +42,7 @@ class HlsRouter {
    * @param {string} filepath 
    * @returns {boolean}
    */
-  validateStreamFilePath(streamDir, filepath) {
+  validateStreamFilePath(streamDir: string, filepath: string): string | boolean {
     const relative = Path.relative(streamDir, filepath)
     return relative && !relative.startsWith('..') && !Path.isAbsolute(relative)
   }
@@ -48,7 +54,7 @@ class HlsRouter {
    * @param {express.Request} req 
    * @param {express.Response} res 
    */
-  async streamFileRequest(req, res) {
+  async streamFileRequest(req: express.Request, res: express.Response): Promise<express.Response | undefined> {
     const streamId = req.params.stream
     // Ensure stream is open
     const stream = this.playbackSessionManager.getStream(streamId)
@@ -97,4 +103,4 @@ class HlsRouter {
     res.sendFile(fullFilePath)
   }
 }
-module.exports = HlsRouter
+export = HlsRouter

@@ -1,15 +1,27 @@
-const passport = require('passport')
-const LocalStrategy = require('../libs/passportLocal')
-const Database = require('../Database')
-const Logger = require('../Logger')
+import passport = require('passport')
+import LocalStrategy = require('../libs/passportLocal')
+import Database = require('../Database')
+import Logger = require('../Logger')
 
-const bcrypt = require('../libs/bcryptjs')
-const requestIp = require('../libs/requestIp')
+import bcrypt = require('../libs/bcryptjs')
+import requestIp = require('../libs/requestIp')
+import type { Request } from 'express'
+type User = import('../models/User')
+
+type VerifyDone = (error: null, user: User | null) => void
+
+interface ChangePasswordResult {
+  error?: string
+  success?: boolean
+}
 
 /**
  * Local authentication strategy using username/password
  */
 class LocalAuthStrategy {
+  declare name: string
+  declare strategy: LocalStrategy | null
+
   constructor() {
     this.name = 'local'
     this.strategy = null
@@ -19,7 +31,7 @@ class LocalAuthStrategy {
    * Get the passport strategy instance
    * @returns {LocalStrategy}
    */
-  getStrategy() {
+  getStrategy(): LocalStrategy {
     if (!this.strategy) {
       this.strategy = new LocalStrategy({ passReqToCallback: true }, this.verifyCredentials.bind(this))
     }
@@ -29,14 +41,14 @@ class LocalAuthStrategy {
   /**
    * Initialize the strategy with passport
    */
-  init() {
+  init(): void {
     passport.use(this.name, this.getStrategy())
   }
 
   /**
    * Remove the strategy from passport
    */
-  unuse() {
+  unuse(): void {
     passport.unuse(this.name)
     this.strategy = null
   }
@@ -48,7 +60,7 @@ class LocalAuthStrategy {
    * @param {string} password
    * @param {Function} done - Passport callback
    */
-  async verifyCredentials(req, username, password, done) {
+  async verifyCredentials(req: Request, username: string, password: string, done: VerifyDone): Promise<void> {
     // Load the user given it's username
     const user = await Database.userModel.getUserByUsername(username.toLowerCase())
 
@@ -102,7 +114,7 @@ class LocalAuthStrategy {
    * @param {string} username
    * @param {string} message
    */
-  logFailedLoginAttempt(req, username, message) {
+  logFailedLoginAttempt(req: Request, username: string, message: string): void {
     if (!req || !username || !message) return
     Logger.error(`[LocalAuth] Failed login attempt for username "${username}" from ip ${requestIp.getClientIp(req)} (${message})`)
   }
@@ -112,9 +124,9 @@ class LocalAuthStrategy {
    * @param {string} password
    * @returns {Promise<string>} hash
    */
-  hashPassword(password) {
+  hashPassword(password: string): Promise<string | null> {
     return new Promise((resolve) => {
-      bcrypt.hash(password, 8, (err, hash) => {
+      bcrypt.hash(password, 8, (err: Error | null, hash: string) => {
         if (err) {
           resolve(null)
         } else {
@@ -130,10 +142,10 @@ class LocalAuthStrategy {
    * @param {import('../models/User')} user
    * @returns {Promise<boolean>}
    */
-  comparePassword(password, user) {
+  comparePassword(password: string, user: User): boolean | Promise<boolean> {
     if (user.type === 'root' && !password && !user.pash) return true
     if (!password || !user.pash) return false
-    return bcrypt.compare(password, user.pash)
+    return bcrypt.compare(password, user.pash) as Promise<boolean> // boundary: libs/bcryptjs (minified UMD) is inferred as an untyped Promise or undefined; called without a callback it returns a Promise<boolean>
   }
 
   /**
@@ -142,7 +154,7 @@ class LocalAuthStrategy {
    * @param {string} password
    * @param {string} newPassword
    */
-  async changePassword(user, password, newPassword) {
+  async changePassword(user: User, password: string, newPassword: string): Promise<ChangePasswordResult> {
     // Only root can have an empty password
     if (user.type !== 'root' && !newPassword) {
       return {
@@ -158,7 +170,7 @@ class LocalAuthStrategy {
       }
     }
 
-    let pw = ''
+    let pw: string | null = ''
     if (newPassword) {
       pw = await this.hashPassword(newPassword)
       if (!pw) {
@@ -183,4 +195,4 @@ class LocalAuthStrategy {
   }
 }
 
-module.exports = LocalAuthStrategy
+export = LocalAuthStrategy

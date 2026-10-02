@@ -5,3 +5,20 @@
 declare module 'uuid' {
   export function v4(): string
 }
+
+// Used by server/managers/EmailManager.ts. from/to allow null because EmailSettings.fromAddress starts as null.
+declare module 'nodemailer' {
+  interface SendMailOptions {
+    from?: string | null
+    to?: string | null
+    subject?: string
+    text?: string
+    html?: string
+    attachments?: { filename: string; path: string }[]
+  }
+  interface Transporter {
+    verify(): Promise<true>
+    sendMail(mailOptions: SendMailOptions): Promise<unknown>
+  }
+  export function createTransport(options: object): Transporter
+}
