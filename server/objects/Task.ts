@@ -1,4 +1,12 @@
-const uuidv4 = require('uuid').v4
+/// <reference path="../types/untypedModules.d.ts" />
+import uuid = require('uuid')
+const uuidv4 = uuid.v4
+
+interface TaskString {
+  text: string
+  key?: string // read with `|| null`, so callers may omit it
+  subs?: string[]
+}
 
 /**
  * @typedef TaskString
@@ -8,6 +16,25 @@ const uuidv4 = require('uuid').v4
  */
 
 class Task {
+  declare id: string | null
+  declare action: string | null
+  declare data: Record<string, unknown> | null
+  declare title: string | null
+  declare titleKey: string | null
+  declare titleSubs: string[] | null
+  declare description: string | null
+  declare descriptionKey: string | null
+  declare descriptionSubs: string[] | null
+  declare error: string | null
+  declare errorKey: string | null
+  declare errorSubs: string[] | null
+  declare showSuccess: boolean
+  declare isFailed: boolean
+  declare isFinished: boolean
+  declare startedAt: number | null
+  declare finishedAt: number | null
+  declare failedAt?: number // only set by setFailed()
+
   constructor() {
     /** @type {string} */
     this.id = null
@@ -82,7 +109,7 @@ class Task {
    * @param {boolean} showSuccess
    * @param {Object} [data]
    */
-  setData(action, titleString, descriptionString, showSuccess, data = {}) {
+  setData(action: string, titleString: TaskString, descriptionString: TaskString | null, showSuccess: boolean, data: Record<string, unknown> = {}): void {
     this.id = uuidv4()
     this.action = action
     this.data = { ...data }
@@ -101,7 +128,7 @@ class Task {
    *
    * @param {TaskString} messageString
    */
-  setFailed(messageString) {
+  setFailed(messageString: TaskString): void {
     this.error = messageString.text
     this.errorKey = messageString.key || null
     this.errorSubs = messageString.subs || null
@@ -116,7 +143,7 @@ class Task {
    * @param {TaskString} [newDescriptionString] update description
    * @param {boolean} [clearDescription] clear description
    */
-  setFinished(newDescriptionString = null, clearDescription = false) {
+  setFinished(newDescriptionString: TaskString | null = null, clearDescription = false): void {
     if (newDescriptionString) {
       this.description = newDescriptionString.text
       this.descriptionKey = newDescriptionString.key || null
@@ -130,4 +157,4 @@ class Task {
     this.finishedAt = Date.now()
   }
 }
-module.exports = Task
+export = Task

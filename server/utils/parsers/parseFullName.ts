@@ -1,13 +1,35 @@
 
 
 // https://github.com/RateGravity/parse-full-name/blob/master/index.js
-module.exports = (nameToParse, partToReturn, fixCase, stopOnError, useLongLists) => {
 
-  var i, j, k, l, m, n, part, comma, titleList, suffixList, prefixList, regex,
-    partToCheck, partFound, partsFoundCount, firstComma, remainingCommas,
-    nameParts = [], nameCommas = [null], partsFound = [],
+/** All name parts; first and last can be undefined because they come from nameParts.shift()/pop() */
+interface ParsedName {
+  title: string
+  first: string | undefined
+  middle: string
+  last: string | undefined
+  nick: string
+  suffix: string
+  error: string[]
+  [part: string]: string | string[] | undefined // fixParsedNameCase() and partToReturn index parts by name
+}
+
+// fixCase includes the literal 'undefined' because the code compares it with the string 'undefined' (see found-bugs.md)
+type FixCaseOption = boolean | number | 'undefined'
+
+export = (
+  nameToParse: string | null | undefined,
+  partToReturn?: string,
+  fixCase?: FixCaseOption,
+  stopOnError?: boolean | number,
+  useLongLists?: boolean | number
+): ParsedName | string | string[] | undefined => {
+
+  var i: number, j: number, k: number, l: number, m: number, n: string[], part: string, comma: string | null, titleList: string[], suffixList: string[], prefixList: string[], regex: RegExp,
+    partToCheck: string, partFound: RegExpMatchArray | null, partsFoundCount: number, firstComma: number, remainingCommas: number,
+    nameParts: string[] = [], nameCommas: (string | null)[] = [null], partsFound: string[] = [],
     conjunctionList = ['&', 'and', 'et', 'e', 'of', 'the', 'und', 'y'],
-    parsedName = {
+    parsedName: ParsedName = {
       title: '', first: '', middle: '', last: '', nick: '', suffix: '', error: []
     };
 
@@ -27,7 +49,7 @@ module.exports = (nameToParse, partToReturn, fixCase, stopOnError, useLongLists)
   useLongLists = useLongLists && useLongLists === 1 ? 1 : 0; // 0 = short lists
 
   // If stopOnError = 1, throw error, otherwise return error messages in array
-  function handleError(errorMessage) {
+  function handleError(errorMessage: string): void {
     if (stopOnError) {
       throw 'Error: ' + errorMessage;
     } else {
@@ -36,7 +58,7 @@ module.exports = (nameToParse, partToReturn, fixCase, stopOnError, useLongLists)
   }
 
   // If fixCase = 1, fix case of parsedName parts before returning
-  function fixParsedNameCase(fixedCaseName, fixCaseNow) {
+  function fixParsedNameCase(fixedCaseName: ParsedName, fixCaseNow: number): ParsedName {
     var forceCaseList = ['e', 'y', 'av', 'af', 'da', 'dal', 'de', 'del', 'der', 'di',
       'la', 'le', 'van', 'der', 'den', 'vel', 'von', 'II', 'III', 'IV', 'J.D.', 'LL.M.',
       'M.D.', 'D.O.', 'D.C.', 'Ph.D.'];
