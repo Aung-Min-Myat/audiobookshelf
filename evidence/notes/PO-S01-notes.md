@@ -40,36 +40,48 @@ Not checked by this run: whether the server actually starts. package.json shows 
 ~[01:36] I added deny rules for Edit and Write on test/**, tsconfig.server.json, package.json, package-lock.json and server/libs/**, and for git reset * and git clean *, so these are enforced by the settings and not only by the text. In Phase 1 only Edit(test/**) was enforced. The deny list in the file now has 19 entries.
 ~[01:38] (exact, Claude's footer) Deny test: I asked Claude to create test/zz-deny-check.txt. The Write tool was blocked with "File is in a directory that is denied by your permission settings", and Test-Path afterwards printed False. Claude said that Edit(test/**) alone also blocks Write; my settings contained both Edit(test/**) and Write(test/**), so the test does not show which rule fired. I did not test the rules for tsconfig.server.json, package.json, package-lock.json or server/libs. Claude noted that shell commands writing into protected paths are not covered by these file rules and would only prompt me.
 
-## Run-day record (fill in on the day of the run)
+## Run-day record (2026-10-03)
 
-- Date and stopwatch start time:
-- Superpowers disabled in /plugin (yes/no), and restarted afterwards (yes/no):
-- /model shows (model and effort):
-- /permissions shows (allow and deny counts, accept edits on):
-- Weekly /usage bar at the start:
-- /usage at the start (full block, including Total cost and Usage by model, saved in evidence/test-results/PO-S01/usage-start.txt):
-- Saved GitHub logins still 0 (yes/no):
-- Baseline compiled copy still present (file count):
+The full record is in evidence/test-results/PO-S01/run-day-record.txt. Key facts: base commit 9f4ff460; weekly bar 33% and session bar 1% at the start; the run happened in the same Claude session as my pre-run checks, not in a fresh session; /model and /permissions were not recorded.
 
-## Checkpoints (every 15 minutes)
+## What happened in the run (2026-10-03, format ~[HH:MM])
+
+~[02:17] (derived, between 02:15 and 02:19) I pasted the prompt in the same session as my pre-run checks. I did not record the clock time. The bounds: my checkpoint at 19 minutes showed 2 commits, so the paste fell between 02:14:52 and 02:19:13, and it was not later than the first commit at 02:19:08.
+~[02:19] (exact, git commit time) cd9e93b8: parseNfoMetadata and TrackProgressMonitor.
+~[02:34] (exact, git commit time 02:33:52) 0234dfcd: Task and parseFullName, plus server/types/untypedModules.d.ts (uuid ships no types) and found-bugs.md (three upstream bugs in parseFullName, not fixed). The agent had tried Notification.ts first and restored it (its report: this[key] = payload[key] over a union of keys does not type-check without a code change).
+~[02:36] (derived, between 02:33:52 and 02:38:13) My checkpoint, 19 minutes after the prompt: 8 .ts files (7 real ones plus server/types/untypedModules.d.ts, which my command counted by mistake), 175 .js files, 2 commits.
+~[02:38] (exact, git commit time) ad78f87e: OpenLibrary. It also removed the cast on isbnLookup() in BookFinder.ts.
+~[02:48] (exact, git commit time) d88b367b: longTimeout, stringifySequelizeQuery, AudioTrack and hlsPlaylistGenerator (one new boundary cast, in hlsPlaylistGenerator.ts), plus blocked-models-BookAuthor-trial.txt, the compiler errors from a BookAuthor trial that the agent reverted (every Sequelize model's static init clashes with Model.init).
+~[02:50] (exact, git commit time 02:49:55) 8d48f5b7: globals and parseUserAgent.
+~[02:52] (exact, Claude's footer) The agent ended the run itself, after a turn of 23m 45s, and reported what it converted, what it could not convert and what it could not verify. It said it needed decisions from me to go further (non-null assertions, an index signature, small code changes, or a typing pattern for the Sequelize models).
+
+## Checkpoints
 
 time | .ts files | .js left | commits | build | note
+start (about 02:17, derived) | 3 | 179 | 0 | pass (356) | base commit 9f4ff460
+about 02:36 (derived) | 8 | 175 | 2 | not checked | 19 minutes after the prompt. My command counted server/types/untypedModules.d.ts, so 7 are real .ts files.
+end (02:52, exact footer) | 14 | 168 | 5 | pass (356, my clean build at about 03:07) | counts from the corrected command that leaves out .d.ts files and server/libs
 
-## Result (after the run)
+I ran no other checkpoint.
 
-- Stopped at (time) because:
-- /usage at the end (full block):
-- Files converted (.ts now / .js left):
-- Build and tests at the end:
-- Final claim of the agent versus the real build and test output:
-- Prompts I answered (Yes / No):
-- Standard replies used:
-- Compaction seen (yes/no):
+## Result (2026-10-03)
 
-## Failure-mode checks (commands in the steps)
+- Stopped at 02:52 (exact, Claude's footer). The agent ended the run itself; my limit was 90 minutes. Reason it gave: most remaining files hit blockers that the rules do not let it work around (every Sequelize model's static init clashes with Model.init; assignment by dynamic key; fields set to null first).
+- Time: from the prompt (about 02:15 to 02:19) to 02:52 is about 33 to 37 minutes of wall time (derived), against the agent's reported turn of 23m 45s. The difference of about 10 to 13 minutes is probably my waiting at permission prompts, but I did not measure it.
+- /usage at the end (usage-end.txt): Total cost $5.28 (API-equivalent), API time 15m 25s, wall time 1h 28m 28s, 67 requests, 98% of input tokens from cache. claude-opus-5-5: 928 input, 93.1k output, 9.3m cache read, 194.3k cache write. Plan limits at the end: session 5%, week 33%. The Recently denied tab was empty.
+- The run alone (end block minus the start block in usage-start.txt, which holds my pre-run checks): about $4.88, 62 requests, about 88.3k output, about 8.9m cache read, about 167.0k cache write, API time about 14m 32s. That is about $0.0054 per converted line (896 lines). The $5.28 includes the checks.
+- Files converted: 11 files in 5 commits, about 896 non-blank lines (the agent's count): 2.1% of the about 42,200 in-scope lines and 1.9% of all 46,182 lines. Of the 14 files on my start list, 5 were converted (parseNfoMetadata, parseFullName, TrackProgressMonitor, Task, OpenLibrary); the other 6 conversions were files the agent found itself (longTimeout, stringifySequelizeQuery, AudioTrack, hlsPlaylistGenerator, globals, parseUserAgent). All 6 Sequelize models on the list were blocked; the agent compiled one of them (BookAuthor). Notification was tried and restored; AudioMetaTags and areEquivalent were judged from reading the code, not compiled.
+- Speed: about 896 lines in about 33 to 37 minutes of wall time is roughly 1,500 lines per hour, on files the agent picked as the easiest. Phase 1's three conversion tasks ran at about 710 lines per hour, with a spec, a plan and gates, on files the plan chose. The two numbers are not a fair comparison.
+- Build and tests at the end: my own clean build and test from an empty dist-server (about 03:07, exact from the mocha log timestamps): 356 passing (5s), no error TS, Debug Failure or failing line. The agent had only built incrementally and ran a non-incremental no-emit check (0 errors).
+- The agent's final claim versus the real output: it claimed 356 passing, 0 errors in a full non-incremental check, no banned tokens, nothing changed under test/ or config, and 5 compiled files with 14 changed lines. My own checks agree with all of these. It also listed what it had not verified: the server was never started, no build from an empty dist-server, test coverage, and any types coming from JavaScript modules.
+- Prompts I answered: not recorded (the transcript does not show permission prompts). Standard replies used: none appear in the transcript. Auto mode or "don't ask again": not recorded.
+- Compaction seen: no compaction message appears in the transcript I copied.
+- Against my definition: Pass. Good only on file count (11 files, but 896 lines against about 1,500). Strong not met. Not checked: the server was never started; only 2 of the 11 files have direct tests (the agent's claim); any types coming from untyped JavaScript are not counted.
 
-- Tests changed:
-- Config changed (tsconfig.server.json, package.json):
-- any / @ts-ignore / as any / as unknown as:
-- Compiled output changed in files that were only meant to get types:
-- Rules in CLAUDE.md that the agent ignored:
+## Failure-mode checks (2026-10-03, my own commands)
+
+- Tests changed: no. git diff --stat against 9f4ff460 for test, config and server/libs printed nothing.
+- Config changed (tsconfig.server.json, package.json): no, same command.
+- any / @ts-ignore / as any / as unknown as: none found in the .ts files outside server/libs. 13 casts, the same number as Phase 1: the agent removed the isbnLookup cast in BookFinder.ts and added one in hlsPlaylistGenerator.ts.
+- Compiled output against my saved Phase 1 build: 5 files changed, 14 changed lines in total (Task 3/1, OpenLibrary 2/1, hlsPlaylistGenerator 2/1, parseNfoMetadata 1/1, parseUserAgent 1/1), no missing files. BookFinder.js compiled identically although its source lost a cast.
+- Rules in CLAUDE.md the agent ignored: none found by my checks. It committed groups of files, which CLAUDE.md allowed; it added server/types/untypedModules.d.ts, which CLAUDE.md did not mention (uuid has no types, and the tsconfig excludes .d.ts files, so it pulled the file in with a reference comment); and it restored failed files with git mv and git restore, as the rules allowed.
