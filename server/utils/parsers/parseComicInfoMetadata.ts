@@ -1,4 +1,18 @@
 
+interface ComicInfoJson {
+  ComicInfo?: {
+    Series?: string[]
+    Number?: string[]
+    Summary?: string[]
+  }
+}
+
+interface ComicInfoMetadata {
+  title: string | null
+  series: { name: string; sequence: string | null }[]
+  description: string | null
+}
+
 /**
  * TODO: Add more fields
  * @see https://anansi-project.github.io/docs/comicinfo/intro
@@ -6,15 +20,15 @@
  * @param {Object} comicInfoJson 
  * @returns {import('../../scanner/BookScanner').BookMetadataObject}
  */
-module.exports.parse = (comicInfoJson) => {
+const parse = (comicInfoJson: ComicInfoJson | null | undefined): ComicInfoMetadata | null => {
   if (!comicInfoJson?.ComicInfo) return null
 
   const ComicSeries = comicInfoJson.ComicInfo.Series?.[0]?.trim() || null
   const ComicNumber = comicInfoJson.ComicInfo.Number?.[0]?.trim() || null
   const ComicSummary = comicInfoJson.ComicInfo.Summary?.[0]?.trim() || null
 
-  let title = null
-  const series = []
+  let title: string | null = null
+  const series: { name: string; sequence: string | null }[] = []
   if (ComicSeries) {
     series.push({
       name: ComicSeries,
@@ -33,3 +47,5 @@ module.exports.parse = (comicInfoJson) => {
     description: ComicSummary
   }
 }
+
+export = { parse }

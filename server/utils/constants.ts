@@ -1,4 +1,4 @@
-module.exports.ScanResult = {
+const ScanResult = {
   NOTHING: 0,
   ADDED: 1,
   UPDATED: 2,
@@ -6,17 +6,17 @@ module.exports.ScanResult = {
   UPTODATE: 4
 }
 
-module.exports.BookCoverAspectRatio = {
+const BookCoverAspectRatio = {
   STANDARD: 0, // 1.6:1
   SQUARE: 1
 }
 
-module.exports.BookshelfView = {
+const BookshelfView = {
   STANDARD: 0,
   DETAIL: 1
 }
 
-module.exports.LogLevel = {
+const LogLevel = {
   TRACE: 0,
   DEBUG: 1,
   INFO: 2,
@@ -26,14 +26,14 @@ module.exports.LogLevel = {
   NOTE: 6
 }
 
-module.exports.PlayMethod = {
+const PlayMethod = {
   DIRECTPLAY: 0,
   DIRECTSTREAM: 1,
   TRANSCODE: 2,
   LOCAL: 3
 }
 
-module.exports.AudioMimeType = {
+const AudioMimeType = {
   MP3: 'audio/mpeg',
   M4B: 'audio/mp4',
   M4A: 'audio/mp4',
@@ -55,4 +55,13 @@ module.exports.AudioMimeType = {
   CAF: 'audio/x-caf',
   MPEG: 'audio/mpeg',
   MPG: 'audio/mpeg'
+}
+
+export = {
+  ScanResult,
+  BookCoverAspectRatio,
+  BookshelfView,
+  LogLevel,
+  PlayMethod,
+  AudioMimeType
 }

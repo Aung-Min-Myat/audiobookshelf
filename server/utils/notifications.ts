@@ -1,6 +1,18 @@
-const { version } = require('../../package.json')
+import packageJson = require('../../package.json')
+const { version } = packageJson
 
-module.exports.notificationData = {
+interface NotificationEventData {
+  name: string
+  requiresLibrary: boolean
+  libraryMediaType?: string
+  description: string
+  descriptionKey: string
+  variables: string[]
+  defaults: { title: string; body: string }
+  testData: { [variable: string]: string | number } // index signature: testData is passed as the template data, whose keys are the event's variables
+}
+
+const notificationData: { events: NotificationEventData[] } = {
   events: [
     {
       name: 'onPodcastEpisodeDownloaded',
@@ -108,3 +120,5 @@ module.exports.notificationData = {
     }
   ]
 }
+
+export = { notificationData }

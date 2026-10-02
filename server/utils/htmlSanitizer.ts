@@ -1,12 +1,14 @@
-const sanitizeHtml = require('../libs/sanitizeHtml')
-const { entities } = require('./htmlEntities')
+import sanitizeHtml = require('../libs/sanitizeHtml')
+import htmlEntities = require('./htmlEntities')
+// Index signature: decodeHTMLEntities() reads the entity table by a dynamic key (the matched entity text)
+const { entities }: { entities: { [entity: string]: string } } = htmlEntities
 
 /**
  *
  * @param {string} html
  * @returns {string}
  */
-function sanitize(html) {
+function sanitize(html: string | null | undefined): string {
   if (typeof html !== 'string') {
     return ''
   }
@@ -23,9 +25,8 @@ function sanitize(html) {
 
   return sanitizeHtml(html, sanitizerOptions)
 }
-module.exports.sanitize = sanitize
 
-function stripAllTags(html, shouldDecodeEntities = true) {
+function stripAllTags(html: string | null | undefined, shouldDecodeEntities = true): string {
   if (typeof html !== 'string') return ''
 
   const sanitizerOptions = {
@@ -36,9 +37,8 @@ function stripAllTags(html, shouldDecodeEntities = true) {
   let sanitized = sanitizeHtml(html, sanitizerOptions)
   return shouldDecodeEntities ? decodeHTMLEntities(sanitized) : sanitized
 }
-module.exports.stripAllTags = stripAllTags
 
-function decodeHTMLEntities(strToDecode) {
+function decodeHTMLEntities(strToDecode: string): string {
   return strToDecode.replace(/\&([^;]+);?/g, function (entity) {
     if (entity in entities) {
       return entities[entity]
@@ -46,3 +46,5 @@ function decodeHTMLEntities(strToDecode) {
     return entity
   })
 }
+
+export = { sanitize, stripAllTags }
