@@ -41,3 +41,6 @@ The spec and plan for the finders are in evidence/plans/ (reference only).
 
 ## Settings (important)
 - Only Edit(path) deny rules work; Write(path) rules are ignored (Claude Code warns about them). Edit rules cover all file-editing tools. Shell commands that write files are not covered by any rule.
+## Type check without building (PO-S03)
+- Run `npx tsc -p tsconfig.check.json` for a no-emit check. It writes nothing, so it is safe to run while other agents work. Filter its output to your own folder (for example with grep "^server/utils/").
+- Only the main agent runs `npm run build:server` and `npm test`, and only the main agent commits.

@@ -16,7 +16,9 @@
                                       "Bash(ls *)",
                                       "Bash(wc *)",
                                       "Bash(head *)",
-                                      "Bash(tail *)"
+                                      "Bash(tail *)",
+                                      "Bash(npx tsc -p tsconfig.check.json)",
+                                      "Bash(npx tsc -p tsconfig.check.json *)"
                                   ],
                         "deny":  [
                                      "Bash(git push *)",
@@ -32,7 +34,8 @@
                                      "Edit(package-lock.json)",
                                      "Edit(server/libs/**)",
                                      "Bash(git reset *)",
-                                     "Bash(git clean *)"
+                                     "Bash(git clean *)",
+                                     "Edit(tsconfig.check.json)"
                                  ]
                     }
 }
