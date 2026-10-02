@@ -1,7 +1,54 @@
-const uuidv4 = require("uuid").v4
+/// <reference path="../types/untypedModules.d.ts" />
+import uuid = require('uuid')
+const uuidv4 = uuid.v4
+
+interface NotificationData {
+  id: string
+  libraryId?: string | null
+  eventName: string
+  urls?: string[]
+  titleTemplate?: string
+  bodyTemplate?: string
+  type?: string | null
+  enabled?: boolean
+  lastFiredAt?: number | null
+  lastAttemptFailed?: boolean
+  numConsecutiveFailedAttempts?: number
+  numTimesFired?: number
+  createdAt: number
+}
+
+interface NotificationPayload {
+  libraryId?: string | null
+  eventName: string
+  urls: string[]
+  titleTemplate: string
+  bodyTemplate: string
+  enabled?: boolean
+  type?: string | null
+}
+
+interface NotificationUpdatePayload extends Partial<NotificationPayload> {
+  [key: string]: unknown // update() reads the payload by a dynamic key
+}
 
 class Notification {
-  constructor(notification = null) {
+  [key: string]: unknown // update() assigns payload values onto this by a dynamic key
+  declare id: string | null
+  declare libraryId: string | null
+  declare eventName: string
+  declare urls: string[]
+  declare titleTemplate: string
+  declare bodyTemplate: string
+  declare type: string | null
+  declare enabled: boolean
+  declare lastFiredAt: number | null
+  declare lastAttemptFailed: boolean
+  declare numConsecutiveFailedAttempts: number
+  declare numTimesFired: number
+  declare createdAt: number | null
+
+  constructor(notification: NotificationData | null = null) {
     this.id = null
     this.libraryId = null
     this.eventName = ''
@@ -22,7 +69,7 @@ class Notification {
     }
   }
 
-  construct(notification) {
+  construct(notification: NotificationData): void {
     this.id = notification.id
     this.libraryId = notification.libraryId || null
     this.eventName = notification.eventName
@@ -56,7 +103,7 @@ class Notification {
     }
   }
 
-  setData(payload) {
+  setData(payload: NotificationPayload): void {
     this.id = uuidv4()
     this.libraryId = payload.libraryId || null
     this.eventName = payload.eventName
@@ -68,7 +115,7 @@ class Notification {
     this.createdAt = Date.now()
   }
 
-  update(payload) {
+  update(payload: NotificationUpdatePayload): boolean {
     if (!this.enabled && payload.enabled) {
       // Reset
       this.lastFiredAt = null
@@ -94,14 +141,14 @@ class Notification {
     return hasUpdated
   }
 
-  updateNotificationFired(success) {
+  updateNotificationFired(success: boolean): void {
     this.lastFiredAt = Date.now()
     this.lastAttemptFailed = !success
     this.numConsecutiveFailedAttempts = success ? 0 : this.numConsecutiveFailedAttempts + 1
     this.numTimesFired++
   }
 
-  replaceVariablesInTemplate(templateText, data) {
+  replaceVariablesInTemplate(templateText: string, data: Record<string, string>): string {
     const ptrn = /{{ ?([a-zA-Z]+) ?}}/mg
 
     var match
@@ -114,15 +161,15 @@ class Notification {
     return updatedTemplate
   }
 
-  parseTitleTemplate(data) {
+  parseTitleTemplate(data: Record<string, string>): string {
     return this.replaceVariablesInTemplate(this.titleTemplate, data)
   }
 
-  parseBodyTemplate(data) {
+  parseBodyTemplate(data: Record<string, string>): string {
     return this.replaceVariablesInTemplate(this.bodyTemplate, data)
   }
 
-  getApprisePayload(data) {
+  getApprisePayload(data: Record<string, string>) {
     return {
       urls: this.urls,
       title: this.parseTitleTemplate(data),
@@ -130,4 +177,4 @@ class Notification {
     }
   }
 }
-module.exports = Notification
+export = Notification

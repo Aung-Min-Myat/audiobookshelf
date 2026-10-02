@@ -1,5 +1,27 @@
+interface FileMetadataData {
+  filename: string | null
+  ext: string | null
+  path: string | null
+  relPath: string | null
+  size: number | null
+  mtimeMs: number | null
+  ctimeMs: number | null
+  birthtimeMs: number | null
+}
+
 class FileMetadata {
-  constructor(metadata) {
+  [key: string]: unknown // update() and setData() copy payload values onto this by a dynamic key
+  declare filename: string | null
+  declare ext: string | null
+  declare path: string | null
+  declare relPath: string | null
+  declare size: number | null
+  declare mtimeMs: number | null
+  declare ctimeMs: number | null
+  declare birthtimeMs: number | null
+  declare wasModified: boolean
+
+  constructor(metadata?: FileMetadataData) {
     this.filename = null
     this.ext = null
     this.path = null
@@ -17,7 +39,7 @@ class FileMetadata {
     this.wasModified = false
   }
 
-  construct(metadata) {
+  construct(metadata: FileMetadataData): void {
     this.filename = metadata.filename
     this.ext = metadata.ext
     this.path = metadata.path
@@ -28,7 +50,7 @@ class FileMetadata {
     this.birthtimeMs = metadata.birthtimeMs
   }
 
-  toJSON() {
+  toJSON(): FileMetadataData {
     return {
       filename: this.filename,
       ext: this.ext,
@@ -41,19 +63,19 @@ class FileMetadata {
     }
   }
 
-  clone() {
+  clone(): FileMetadata {
     return new FileMetadata(this.toJSON())
   }
 
-  get format() {
+  get format(): string {
     if (!this.ext) return ''
     return this.ext.slice(1).toLowerCase()
   }
-  get filenameNoExt() {
-    return this.filename.replace(this.ext, '')
+  get filenameNoExt(): string {
+    return this.filename!.replace(this.ext!, '') // filename and ext are set by construct() or setData() before this is read
   }
 
-  update(payload) {
+  update(payload: Record<string, unknown>): boolean {
     var hasUpdates = false
     for (const key in payload) {
       if (this[key] !== undefined && this[key] !== payload[key]) {
@@ -64,7 +86,7 @@ class FileMetadata {
     return hasUpdates
   }
 
-  setData(payload) {
+  setData(payload: Record<string, unknown>): void {
     for (const key in payload) {
       if (this[key] !== undefined) {
         this[key] = payload[key]
@@ -72,4 +94,4 @@ class FileMetadata {
     }
   }
 }
-module.exports = FileMetadata
+export = FileMetadata
