@@ -1,6 +1,6 @@
-const fs = require('../../libs/fsExtra')
+import fs = require('../../libs/fsExtra')
 
-function getPlaylistStr(segmentName, duration, segmentLength, hlsSegmentType) {
+function getPlaylistStr(segmentName: string, duration: number, segmentLength: number, hlsSegmentType: string): string {
   var ext = hlsSegmentType === 'fmp4' ? 'm4s' : 'ts'
 
   var lines = [
@@ -28,8 +28,9 @@ function getPlaylistStr(segmentName, duration, segmentLength, hlsSegmentType) {
   return lines.join('\n')
 }
 
-function generatePlaylist(outputPath, segmentName, duration, segmentLength, hlsSegmentType) {
+function generatePlaylist(outputPath: string, segmentName: string, duration: number, segmentLength: number, hlsSegmentType: string): Promise<void> {
   var playlistStr = getPlaylistStr(segmentName, duration, segmentLength, hlsSegmentType)
-  return fs.writeFile(outputPath, playlistStr)
+  // libs/fsExtra/fs adds the promisified fs methods in a loop (exports[method] = u(fs[method])), so its inferred type has no writeFile
+  return (fs as typeof fs & { writeFile(file: string, data: string): Promise<void> }).writeFile(outputPath, playlistStr)
 }
-module.exports = generatePlaylist
+export = generatePlaylist
