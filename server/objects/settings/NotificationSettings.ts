@@ -1,9 +1,39 @@
-const Logger = require('../../Logger')
-const Notification = require('../Notification')
-const { isNullOrNaN } = require('../../utils')
+import Logger = require('../../Logger')
+import Notification = require('../Notification')
+import utils = require('../../utils')
+const { isNullOrNaN }: { isNullOrNaN: (num: unknown) => boolean } = utils
+
+type NotificationData = NonNullable<ConstructorParameters<typeof Notification>[0]>
+type NotificationPayload = Parameters<Notification['setData']>[0]
+type NotificationUpdatePayload = Parameters<Notification['update']>[0]
+
+/** Settings JSON as stored in the database by toJSON(); absent keys fall back to defaults */
+interface NotificationSettingsData {
+  id?: string
+  appriseType: string
+  appriseApiUrl?: string | null
+  notifications?: NotificationData[]
+  maxFailedAttempts?: number
+  maxNotificationQueue?: number
+  notificationDelay?: number
+}
+
+interface NotificationSettingsUpdatePayload {
+  appriseApiUrl?: string | null
+  maxFailedAttempts?: number | string | null
+  maxNotificationQueue?: number | string | null
+}
 
 class NotificationSettings {
-  constructor(settings = null) {
+  declare id: string
+  declare appriseType: string
+  declare appriseApiUrl: string | null
+  declare notifications: Notification[]
+  declare maxFailedAttempts: number
+  declare maxNotificationQueue: number
+  declare notificationDelay: number
+
+  constructor(settings: NotificationSettingsData | null = null) {
     this.id = 'notification-settings'
     this.appriseType = 'api'
     this.appriseApiUrl = null
@@ -17,7 +47,7 @@ class NotificationSettings {
     }
   }
 
-  construct(settings) {
+  construct(settings: NotificationSettingsData): void {
     this.appriseType = settings.appriseType
     this.appriseApiUrl = settings.appriseApiUrl || null
     this.notifications = (settings.notifications || []).map((n) => new Notification(n))
@@ -46,7 +76,7 @@ class NotificationSettings {
    * @param {string} eventName
    * @returns {boolean} - TRUE if there are active notifications for the event
    */
-  getHasActiveNotificationsForEvent(eventName) {
+  getHasActiveNotificationsForEvent(eventName: string): boolean {
     return this.notifications.some((n) => n.eventName === eventName && n.enabled)
   }
 
@@ -54,15 +84,15 @@ class NotificationSettings {
    * @param {string} eventName
    * @returns {Notification[]}
    */
-  getActiveNotificationsForEvent(eventName) {
+  getActiveNotificationsForEvent(eventName: string): Notification[] {
     return this.notifications.filter((n) => n.eventName === eventName && n.enabled)
   }
 
-  getNotification(id) {
+  getNotification(id: string): Notification | undefined {
     return this.notifications.find((n) => n.id === id)
   }
 
-  removeNotification(id) {
+  removeNotification(id: string): boolean {
     if (this.notifications.some((n) => n.id === id)) {
       this.notifications = this.notifications.filter((n) => n.id !== id)
       return true
@@ -70,7 +100,7 @@ class NotificationSettings {
     return false
   }
 
-  update(payload) {
+  update(payload: NotificationSettingsUpdatePayload | null | undefined): boolean {
     if (!payload) return false
 
     var hasUpdates = false
@@ -94,7 +124,7 @@ class NotificationSettings {
     return hasUpdates
   }
 
-  createNotification(payload) {
+  createNotification(payload: NotificationPayload | null | undefined): boolean {
     if (!payload) return false
     if (!payload.eventName || !payload.urls.length) return false
 
@@ -104,7 +134,7 @@ class NotificationSettings {
     return true
   }
 
-  updateNotification(payload) {
+  updateNotification(payload: NotificationUpdatePayload | null | undefined): boolean {
     if (!payload) return false
     const notification = this.notifications.find((n) => n.id === payload.id)
     if (!notification) {
@@ -115,4 +145,4 @@ class NotificationSettings {
     return notification.update(payload)
   }
 }
-module.exports = NotificationSettings
+export = NotificationSettings

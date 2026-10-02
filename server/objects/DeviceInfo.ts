@@ -1,11 +1,67 @@
-const uuidv4 = require('uuid').v4
-const { stripAllTags } = require('../utils/htmlSanitizer')
+/// <reference path="../types/untypedModules.d.ts" />
+import uuid = require('uuid')
+const uuidv4 = uuid.v4
+import htmlSanitizer = require('../utils/htmlSanitizer')
+const { stripAllTags } = htmlSanitizer
+
+/** Stored device info, as written by toJSON() (null fields are left out) */
+interface DeviceInfoData {
+  [key: string]: string | null | undefined // construct(), toJSON() and update() read, delete and copy fields by a dynamic key
+  id?: string | null
+  userId?: string | null
+  deviceId?: string | null
+  ipAddress?: string | null
+  browserName?: string | null
+  browserVersion?: string | null
+  osName?: string | null
+  osVersion?: string | null
+  deviceType?: string | null
+  clientVersion?: string | null
+  manufacturer?: string | null
+  model?: string | null
+  sdkVersion?: string | null
+  clientName?: string | null
+  deviceName?: string | null
+}
+
+/** The parts of a ua-parser-js result that setData() reads */
+interface UserAgentInfo {
+  browser: { name?: string; version?: string }
+  os: { name?: string; version?: string }
+  device: { type?: string }
+}
+
+/** Device info sent by a client app */
+interface ClientDeviceInfo {
+  deviceId?: string
+  clientVersion?: string
+  manufacturer?: string
+  model?: string
+  sdkVersion?: string | number
+  clientName?: string
+}
 
 class DeviceInfo {
+  [key: string]: unknown // construct() and update() assign fields by a dynamic key
   /** @type {string[]} Fields to sanitize when loading from stored data */
   static stringFields = ['deviceId', 'clientVersion', 'manufacturer', 'model', 'sdkVersion', 'clientName', 'deviceName']
+  declare id: string | null
+  declare userId: string | null | undefined // setData() is passed req.user?.id
+  declare deviceId: string | null
+  declare ipAddress: string | null
+  declare browserName: string | null
+  declare browserVersion: string | null
+  declare osName: string | null
+  declare osVersion: string | null
+  declare deviceType: string | null
+  declare clientVersion: string | null
+  declare manufacturer: string | null
+  declare model: string | null
+  declare sdkVersion: string | null
+  declare clientName: string | null
+  declare deviceName: string | null
 
-  constructor(deviceInfo = null) {
+  constructor(deviceInfo: DeviceInfoData | null = null) {
     this.id = null
     this.userId = null
     this.deviceId = null
@@ -32,7 +88,7 @@ class DeviceInfo {
     }
   }
 
-  construct(deviceInfo) {
+  construct(deviceInfo: DeviceInfoData): void {
     for (const key in deviceInfo) {
       if (deviceInfo[key] !== undefined && this[key] !== undefined) {
         this[key] = DeviceInfo.stringFields.includes(key) ? stripAllTags(deviceInfo[key]) : deviceInfo[key]
@@ -40,8 +96,8 @@ class DeviceInfo {
     }
   }
 
-  toJSON() {
-    const obj = {
+  toJSON(): DeviceInfoData {
+    const obj: DeviceInfoData = {
       id: this.id,
       userId: this.userId,
       deviceId: this.deviceId,
@@ -76,12 +132,12 @@ class DeviceInfo {
   }
 
   // When client doesn't send a device id
-  getTempDeviceId() {
+  getTempDeviceId(): string {
     const keys = [this.userId, this.browserName, this.browserVersion, this.osName, this.osVersion, this.clientVersion, this.manufacturer, this.model, this.sdkVersion, this.ipAddress].map((k) => k || '')
     return 'temp-' + Buffer.from(keys.join('-'), 'utf-8').toString('base64')
   }
 
-  setData(ip, ua, clientDeviceInfo, serverVersion, userId) {
+  setData(ip: string | null | undefined, ua: UserAgentInfo | null | undefined, clientDeviceInfo: ClientDeviceInfo | null | undefined, serverVersion: string, userId: string | null | undefined): void {
     this.id = uuidv4()
     this.userId = userId
     this.deviceId = clientDeviceInfo?.deviceId || this.id
@@ -122,7 +178,7 @@ class DeviceInfo {
     }
   }
 
-  update(deviceInfo) {
+  update(deviceInfo: DeviceInfo): boolean {
     const deviceInfoJson = deviceInfo.toJSON ? deviceInfo.toJSON() : deviceInfo
     const existingDeviceInfoJson = this.toJSON()
 
@@ -148,4 +204,4 @@ class DeviceInfo {
     return hasUpdates
   }
 }
-module.exports = DeviceInfo
+export = DeviceInfo
