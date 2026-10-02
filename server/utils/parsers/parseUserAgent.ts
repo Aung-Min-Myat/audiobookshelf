@@ -1,14 +1,24 @@
-const uaParserJs = require('../../libs/uaParser')
+import uaParserJs = require('../../libs/uaParser')
+
+interface UserAgentInfo {
+  browserName?: string
+  browserVersion?: string
+  osName?: string
+  osVersion?: string
+  deviceType?: string
+  model?: string
+  vendor?: string
+}
 
 /**
  * @param {string|null|undefined} userAgent
  * @returns {{ browserName?:string, browserVersion?:string, osName?:string, osVersion?:string, deviceType?:string, model?:string, vendor?:string }|null}
  */
-function parseUserAgent(userAgent) {
+function parseUserAgent(userAgent: string | null | undefined): UserAgentInfo | null {
   if (!userAgent) return null
 
   const ua = uaParserJs(userAgent)
-  const deviceInfo = {
+  const deviceInfo: Record<string, string | undefined> = { // indexed by the for...in key below
     browserName: ua?.browser?.name || undefined,
     browserVersion: ua?.browser?.version || undefined,
     osName: ua?.os?.name || undefined,
@@ -25,4 +35,4 @@ function parseUserAgent(userAgent) {
   return Object.keys(deviceInfo).length ? deviceInfo : null
 }
 
-module.exports = parseUserAgent
+export = parseUserAgent
