@@ -1,7 +1,31 @@
-const uuidv4 = require('uuid').v4
-const Logger = require('../Logger')
+/// <reference path="../types/untypedModules.d.ts" />
+import uuid = require('uuid')
+import Logger = require('../Logger')
+const uuidv4 = uuid.v4
+
+interface ScanLog {
+  timestamp: string
+  message: string
+  levelName: string
+  level: number
+}
 
 class ScanLogger {
+  declare id: string | null
+  declare type: string | null
+  declare name: string | null
+  declare verbose: boolean
+
+  declare startedAt: number | null
+  declare finishedAt: number | null
+  declare elapsed: number | null
+
+  declare authorsRemovedFromBooks: string[]
+  declare authorsNumBooksChangedIds: Set<string>
+  declare seriesRemovedFromBooks: string[]
+
+  declare logs: ScanLog[]
+
   constructor() {
     this.id = null
     this.type = null
@@ -33,20 +57,20 @@ class ScanLogger {
     }
   }
 
-  setData(type, name) {
+  setData(type: string, name: string): void {
     this.id = uuidv4()
     this.type = type
     this.name = name
     this.startedAt = Date.now()
   }
 
-  setComplete() {
+  setComplete(): void {
     this.finishedAt = Date.now()
-    this.elapsed = this.finishedAt - this.startedAt
+    this.elapsed = this.finishedAt - this.startedAt! // startedAt is set by setData() before setComplete() runs
   }
 
-  addLog(level, ...args) {
-    const logObj = {
+  addLog(level: number, ...args: unknown[]): void {
+    const logObj: ScanLog = {
       timestamp: new Date().toISOString(),
       message: args.join(' '),
       levelName: Logger.getLogLevelString(level),
@@ -59,4 +83,4 @@ class ScanLogger {
     this.logs.push(logObj)
   }
 }
-module.exports = ScanLogger
+export = ScanLogger
