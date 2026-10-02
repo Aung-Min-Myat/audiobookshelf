@@ -14,7 +14,7 @@ Prompt: evidence/plans/SP-S01-prompt.md
 
 /usage before: session 9% | week (all models) 25% | week (Fable) 12%
 
-How to read the times: these notes were written afterwards from the terminal output. Every line starts with ~[HH:MM]. Lines marked "exact" took their time from a file timestamp, a git commit time or Claude's footer. The other times are estimates. An earlier draft had several times 10 to 15 minutes too late, and they were corrected using file timestamps.
+How to read the times: these notes were written afterwards from the terminal output. Every line starts with ~[HH:MM]. Lines marked "exact" took their time from a file timestamp, a git commit time or Claude's footer. The other times are estimates. An earlier draft had several times 10 to 15 minutes too late, and they were corrected using file timestamps. Lines after midnight carry their date.
 
 ## What happened
 
@@ -160,6 +160,16 @@ How to read the times: these notes were written afterwards from the terminal out
 ~[23:10] /usage contributions panel (last 24h, approximate, local sessions on this machine): 81% of usage at over 150k context; superpowers plugin 32% (brainstorming 14%, test-driven-development 10%, writing-plans 5%, verification-before-completion 2%, executing-plans 1%). This window covers S01, S02 and the earlier Fable test session.
 ~[23:20] S02 session ID: f30c058e-bf4a-4b68-bf62-f1369dd3e161. The local log with this name holds 36 messages, which matches the 36 requests on S02's /usage, so the ID is confirmed. I did not use claude --resume for S02.
 ~[23:20] I checked the token numbers against the local session logs with a read-only script (it sums the usage fields of the log, one entry per message). S02: 36 messages, which matches the 36 requests on /usage; 72 input, 42,624 output, 3,823,902 cache read and 124,294 cache write, against 674, 42.7k, 4.1m and 127.2k displayed. S01: 111 messages, which matches the 111 requests shown at its end; 222 input, 320,849 output, 36,147,133 cache read and 451,622 cache write. The script is low by about 0.2% on output, 2% on cache write and 7% on cache read in S02, and it does not see the Haiku calls. Priced at the published Opus 5.5 rates, the S02 log gives $2.61 against the displayed $2.69. The script, its output and the pricing are saved in evidence/test-results/SP-S01/token-check.txt. Details in the section "Tokens and cost".
+
+## After S02: author rewrite, close and first push (2026-10-02 23:46 to 2026-10-03 00:04)
+
+~[23:46] (exact, git reflog 23:46:31 to 23:46:48) I rewrote the author of the 29 commits since the baseline before the first push (git rebase 7d10b8fc with git commit --amend --author, using my GitHub noreply address). I had made a local backup branch first, and it was never pushed. Checks: 29 commits before and after; every author date and subject unchanged; 0 commits with my personal address left; git diff against the backup printed nothing (identical file contents). All hashes changed.
+~[23:47] (exact, git reflog 23:47:45) I committed the hash map (585ff588, evidence/notes/hash-map.txt). The notes, replies and final-report.md still quote the old hashes; the original finder code is also at the public baseline 7d10b8fc. New hashes for the report: PodcastFinder 06e1c1ba, AuthorFinder e79bc961, BookFinder d272c2de, spec 8cf76626, plan ead99390, final verification and report b7d7f00f.
+~[23:50] (derived: the S02 session log was last written at 23:50:17) I closed Claude Code. S02 session ID f30c058e-bf4a-4b68-bf62-f1369dd3e161, not resumed. Not done in S02 by choice: the whole-branch reviewer and the finish step.
+~[23:55] before pushing I checked the whole history: every commit has my GitHub noreply address as author and committer, and a search of every commit message and diff for my Windows username, personal email and surname found nothing. I also created the branch Aung-Min-Myat/phase1 on the group's shared fork on GitHub (github.com/hahaArthur17/audiobookshelf). The fetch showed it still at the baseline 7d10b8fc, so the push would be a fast-forward. The time of this line is an estimate.
+~[23:59] (exact, git reflog 23:59:21) git fetch arthur stored the new remote branch at 7d10b8fc.
+~[00:00] (exact, git reflog 2026-10-03 00:00:11) I pushed Aung-Min-Myat/phase1 for the first time to the group's shared fork, on my own branch only (not master): 7d10b8fc..585ff588, a fast-forward, 213 objects (125.28 KiB). I did not open a pull request. git status -sb afterwards showed the branch in step with arthur/Aung-Min-Myat/phase1 (both 585ff588).
+~[00:04] (exact, Get-Date 2026-10-03 00:04) my branch listing also shows origin/Aung-Min-Myat/phase1 at 585ff588, so the branch is on my own fork as well (github.com/Aung-Min-Myat/audiobookshelf). I did not record when I pushed it there. git branch --list "backup-*" printed nothing, so the local backup branch no longer exists. git status --short printed nothing. Not yet done at this time: removing the saved GitHub login from this machine (4 lines matching "github" in the Windows credential list) and checking the report links.
 
 ## Tokens and cost
 
