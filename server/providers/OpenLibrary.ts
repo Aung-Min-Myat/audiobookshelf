@@ -1,7 +1,60 @@
-const axios = require('axios').default
+import axiosModule = require('axios')
+const axios = axiosModule.default
+
+// lib.d.ts types isNaN(number), but the built-in coerces every value and publish years arrive as strings. Widens the type for this file only; emits no code.
+declare function isNaN(value: unknown): boolean
+
+/** One doc of openlibrary.org/search.json (only the fields read here) */
+interface OpenLibrarySearchDoc {
+  key: string
+  title: string
+  author_name?: string[]
+  first_publish_year?: number
+  cover_edition_key?: string
+}
+
+interface OpenLibrarySearchJson {
+  docs: OpenLibrarySearchDoc[]
+}
+
+/** openlibrary.org works JSON (only the fields read here) */
+interface OpenLibraryWorksJson {
+  covers?: number[]
+  description?: string | { value?: string }
+  first_publish_date?: string
+}
+
+interface OpenLibraryWorksData {
+  id: string | undefined
+  key: string
+  covers: string[]
+  first_publish_date: string | undefined
+  description: string | null
+}
+
+interface OpenLibraryWorksError {
+  errorMsg: string
+  errorCode: 500
+  first_publish_date?: undefined // lets parsePublishYear() read the field from either shape
+}
+
+/** Returned when the HTTP request failed (get() resolved to null) */
+interface OpenLibraryNotFound {
+  errorCode: 404
+}
+
+type OpenLibrarySearchResult = {
+  title: string
+  author: string | null
+  publishedYear: string | null
+  edition: string | undefined
+  cover: string | null
+} & (OpenLibraryWorksData | OpenLibraryWorksError)
 
 class OpenLibrary {
   #responseTimeout = 10000
+
+  declare baseUrl: string
 
   constructor() {
     this.baseUrl = 'https://openlibrary.org'
@@ -13,23 +66,23 @@ class OpenLibrary {
    * @param {number} timeout
    * @returns {Promise<Object>}
    */
-  get(uri, timeout = this.#responseTimeout) {
+  get<T>(uri: string, timeout: number = this.#responseTimeout): Promise<T | null> {
     if (!timeout || isNaN(timeout)) timeout = this.#responseTimeout
     return axios
-      .get(`${this.baseUrl}/${uri}`, {
+      .get<T>(`${this.baseUrl}/${uri}`, {
         timeout
       })
       .then((res) => {
         return res.data
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.error('Failed', error.message)
         return null
       })
   }
 
-  async isbnLookup(isbn) {
-    var lookupData = await this.get(`/isbn/${isbn}`)
+  async isbnLookup(isbn: string): Promise<Record<string, unknown> | OpenLibraryNotFound> {
+    var lookupData = await this.get<Record<string, unknown>>(`/isbn/${isbn}`)
     if (!lookupData) {
       return {
         errorCode: 404
@@ -38,8 +91,8 @@ class OpenLibrary {
     return lookupData
   }
 
-  async getWorksData(worksKey) {
-    var worksData = await this.get(`${worksKey}.json`)
+  async getWorksData(worksKey: string): Promise<OpenLibraryWorksData | OpenLibraryWorksError> {
+    var worksData = await this.get<OpenLibraryWorksJson>(`${worksKey}.json`)
     if (!worksData) {
       return {
         errorMsg: 'Works Data Request failed',
@@ -65,7 +118,7 @@ class OpenLibrary {
     }
   }
 
-  parsePublishYear(doc, worksData) {
+  parsePublishYear(doc: OpenLibrarySearchDoc, worksData: OpenLibraryWorksData | OpenLibraryWorksError): string | null {
     if (doc.first_publish_year && !isNaN(doc.first_publish_year)) return String(doc.first_publish_year)
     if (worksData.first_publish_date) {
       var year = worksData.first_publish_date.split('-')[0]
@@ -74,7 +127,7 @@ class OpenLibrary {
     return null
   }
 
-  async cleanSearchDoc(doc) {
+  async cleanSearchDoc(doc: OpenLibrarySearchDoc): Promise<OpenLibrarySearchResult> {
     var worksData = await this.getWorksData(doc.key)
     return {
       title: doc.title,
@@ -86,11 +139,11 @@ class OpenLibrary {
     }
   }
 
-  async search(query) {
+  async search(query: Record<string, string>): Promise<OpenLibrarySearchResult[] | OpenLibraryNotFound> {
     var queryString = Object.keys(query)
       .map((key) => key + '=' + query[key])
       .join('&')
-    var lookupData = await this.get(`/search.json?${queryString}`)
+    var lookupData = await this.get<OpenLibrarySearchJson>(`/search.json?${queryString}`)
     if (!lookupData) {
       return {
         errorCode: 404
@@ -106,9 +159,9 @@ class OpenLibrary {
    * @param {number} timeout
    * @returns {Promise<Object[]>}
    */
-  async searchTitle(title, timeout = this.#responseTimeout) {
+  async searchTitle(title: string, timeout: number = this.#responseTimeout): Promise<OpenLibrarySearchResult[] | OpenLibraryNotFound> {
     title = encodeURIComponent(title)
-    var lookupData = await this.get(`/search.json?title=${title}`, timeout)
+    var lookupData = await this.get<OpenLibrarySearchJson>(`/search.json?title=${title}`, timeout)
     if (!lookupData) {
       return {
         errorCode: 404
@@ -118,4 +171,4 @@ class OpenLibrary {
     return searchDocs
   }
 }
-module.exports = OpenLibrary
+export = OpenLibrary

@@ -104,7 +104,7 @@ class BookFinder {
   }
 
   async findByISBN(isbn: string): Promise<OpenLibraryIsbnLookupResult> {
-    var book = await this.openLibrary.isbnLookup(isbn) as OpenLibraryIsbnLookupResult
+    var book = await this.openLibrary.isbnLookup(isbn)
     if (book.errorCode) {
       Logger.error('Book not found')
     }
